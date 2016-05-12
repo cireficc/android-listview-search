@@ -2,18 +2,18 @@ package com.vidalingua.whatsnew.listviewsearch;
 
 public class Word {
 
-    String word;
+    String original;
     String normalized;
 
-    public Word(String word, String normalized) {
-        this.word = word;
+    public Word(String original, String normalized) {
+        this.original = original;
         this.normalized = normalized;
     }
 
-    public String getWord() { return word; }
+    public String getOriginal() { return original; }
 
-    public void setWord(String word) {
-        this.word = word;
+    public void setOriginal(String original) {
+        this.original = original;
     }
 
     public String getNormalized() { return normalized; }

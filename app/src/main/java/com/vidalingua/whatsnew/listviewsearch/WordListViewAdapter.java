@@ -53,7 +53,7 @@ public class WordListViewAdapter extends ArrayAdapter<Word> {
 
         Word word = wordArrayList.get(position);
         //Log.i("FILTER", "Got word: " + word.getWord());
-        holder.wordView.setText(word.getWord());
+        holder.wordView.setText(word.getOriginal());
 
         return row;
     }
@@ -89,7 +89,7 @@ public class WordListViewAdapter extends ArrayAdapter<Word> {
             FilterResults results = new FilterResults();
             boolean asciiSearch = search.matches("\\A\\p{ASCII}*\\z");
 
-            Log.i("FILTER", "Filtering... searched for: " + constraint + " --> asciiSearch? " + asciiSearch);
+            //Log.i("FILTER", "Filtering... searched for: " + constraint + " --> asciiSearch? " + asciiSearch);
 
             // No filter implemented, so return the whole list
             if (search == null || search.length() == 0) {
@@ -122,7 +122,7 @@ public class WordListViewAdapter extends ArrayAdapter<Word> {
                     else {
 
                         // Split the normalized form of the word, and filter against the start of each word
-                        String[] originalSplit = w.getWord().split(" ");
+                        String[] originalSplit = w.getOriginal().split(" ");
 
                         for (String s : originalSplit) {
                             if (s.startsWith(search.toString())) {
