@@ -17,10 +17,14 @@ import java.util.List;
 public class WordListViewAdapter extends ArrayAdapter<Word> {
 
     private final Context context;
+    private final String FILTER_TAG = "FILTER";
     private List<Word> wordArrayList;
     private List<Word> originalWordArrayList;
     private WordFilter wordFilter;
-    private String ASCII_REGEX = "\\A\\p{ASCII}*\\z";
+    // Regex to match ASCII-only strings
+    private final String ASCII_ONLY_REGEX = "\\A\\p{ASCII}*\\z";
+    // Regex to match non-ASCII characters
+    private final String NON_ASCII_REGEX = "[^\\p{ASCII}]";
 
     public WordListViewAdapter(Context context, List<Word> wordArrayList) {
 
@@ -55,7 +59,7 @@ public class WordListViewAdapter extends ArrayAdapter<Word> {
         }
 
         Word word = wordArrayList.get(position);
-        //Log.i("FILTER", "Got word: " + word.getOriginal());
+        //Log.i(FILTER_TAG, "Got word: " + word.getOriginal());
         holder.wordView.setText(word.getOriginal());
 
         return row;
@@ -72,7 +76,7 @@ public class WordListViewAdapter extends ArrayAdapter<Word> {
         if (asciiOnly) {
 
             if (word.getNormalized().startsWith(normalizedSearch)) {
-                Log.i("FILTER", "Matched on normalized (whole)");
+                Log.i(FILTER_TAG, "Matched on normalized (whole)");
                 return true;
             }
 
@@ -81,7 +85,7 @@ public class WordListViewAdapter extends ArrayAdapter<Word> {
 
             for (String s: normalizedSplit) {
                 if (s.startsWith(normalizedSearch)) {
-                    Log.i("FILTER", "Matched on normalized (split)");
+                    Log.i(FILTER_TAG, "Matched on normalized (split)");
                     return true;
                 }
             }
@@ -91,7 +95,7 @@ public class WordListViewAdapter extends ArrayAdapter<Word> {
         else {
 
             if (word.getOriginal().toLowerCase().startsWith(search.toLowerCase())) {
-                Log.i("FILTER", "Matched on original (whole)");
+                Log.i(FILTER_TAG, "Matched on original (whole)");
                 return true;
             }
 
@@ -100,13 +104,13 @@ public class WordListViewAdapter extends ArrayAdapter<Word> {
 
             for (String s : originalSplit) {
                 if (s.toLowerCase().startsWith(search.toLowerCase())) {
-                    Log.i("FILTER", "Matched on original split");
+                    Log.i(FILTER_TAG, "Matched on original split");
                     return true;
                 }
             }
 
             if (word.getAlternative().contains(search)) {
-                Log.i("FILTER", "Matched on alternative (whole)");
+                Log.i(FILTER_TAG, "Matched on alternative (whole)");
                 return true;
             }
         }
@@ -119,18 +123,18 @@ public class WordListViewAdapter extends ArrayAdapter<Word> {
         String search = constraint.toString();
         String normalizedSearch =
                 Normalizer.normalize(search, Normalizer.Form.NFD)
-                .replaceAll("[^\\p{ASCII}]", "")
+                .replaceAll(NON_ASCII_REGEX, "")
                 .toLowerCase();
-        Log.i("FILTER", "Normalized search term: " + normalizedSearch);
-        boolean asciiSearch = search.matches(ASCII_REGEX);
+        Log.i(FILTER_TAG, "Normalized search term: " + normalizedSearch);
+        boolean asciiSearch = search.matches(ASCII_ONLY_REGEX);
 
-        Log.i("FILTER", "Using first matching entry position");
+        Log.i(FILTER_TAG, "Using first matching entry position");
 
         long start = System.currentTimeMillis();
 
         // If no constraint, simply go to the top of the list
         if (constraint == null || constraint.length() == 0) {
-            Log.i("FILTER", "Null or empty search: null? " + (constraint == null) + " || empty? " + constraint.length());
+            Log.i(FILTER_TAG, "Null or empty search: null? " + (constraint == null) + " || empty? " + constraint.length());
             return 0;
         }
 
@@ -173,22 +177,22 @@ public class WordListViewAdapter extends ArrayAdapter<Word> {
             String search = constraint.toString();
             String normalizedSearch =
                     Normalizer.normalize(search, Normalizer.Form.NFD)
-                    .replaceAll("[^\\p{ASCII}]", "")
+                    .replaceAll(NON_ASCII_REGEX, "")
                     .toLowerCase();
-            Log.i("FILTER", "Normalized search term: " + normalizedSearch);
-            boolean asciiSearch = search.matches(ASCII_REGEX);
+            Log.i(FILTER_TAG, "Normalized search term: " + normalizedSearch);
+            boolean asciiSearch = search.matches(ASCII_ONLY_REGEX);
             FilterResults results = new FilterResults();
 
-            Log.i("FILTER", "Filtering... searched for: " + constraint + " --> asciiSearch? " + asciiSearch);
+            Log.i(FILTER_TAG, "Filtering... searched for: " + constraint + " --> asciiSearch? " + asciiSearch);
 
             long start = System.currentTimeMillis();
 
             // No filter implemented, so return the whole list
             if (search == null || search.length() == 0) {
-                //Log.i("FILTER", "No filter applied");
+                //Log.i(FILTER_TAG, "No filter applied");
                 results.values = wordArrayList;
                 results.count = wordArrayList.size();
-                Log.i("FILTER", "Word array list size: " + wordArrayList.size());
+                Log.i(FILTER_TAG, "Word array list size: " + wordArrayList.size());
             }
             // Perform the filtering operation
             else {
@@ -217,7 +221,7 @@ public class WordListViewAdapter extends ArrayAdapter<Word> {
                 notifyDataSetInvalidated();
             else {
                 wordArrayList = (List<Word>) results.values;
-                Log.i("FILTER", "Word array list new length: " + wordArrayList.size());
+                Log.i(FILTER_TAG, "Word array list new length: " + wordArrayList.size());
                 notifyDataSetChanged();
             }
         }
