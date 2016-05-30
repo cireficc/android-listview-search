@@ -49,12 +49,10 @@ public class MainActivity extends Activity {
                 Log.i("FILTER", "Search type: " + searchType);
 
                 if (searchType.equalsIgnoreCase("scrolltoposition")) {
-                    Log.i("FILTER", "Using scroll to position");
                     int matchedPosition = adapter.getFirstMatchingEntryPosition(cs);
                     lv.setSelection(matchedPosition);
                 }
                 else {
-                    Log.i("FILTER", "Using filter");
                     adapter.getFilter().filter(cs);
                 }
 

@@ -19,6 +19,7 @@ public class WordListViewAdapter extends ArrayAdapter<Word> {
     private List<Word> wordArrayList;
     private List<Word> originalWordArrayList;
     private WordFilter wordFilter;
+    private String ASCII_REGEX = "\\A\\p{ASCII}*\\z";
 
     public WordListViewAdapter(Context context, List<Word> wordArrayList) {
 
@@ -64,29 +65,69 @@ public class WordListViewAdapter extends ArrayAdapter<Word> {
         wordArrayList = originalWordArrayList;
     }
 
+    public boolean matches(String search, Word word, boolean asciiOnly) {
+
+        // TODO: The search term should be normalized so that we can just search against the normalized field
+
+        // If the search term contained only ASCII, search using the normalized word
+        if (asciiOnly) {
+
+            if (word.getNormalized().startsWith(search)) {
+                Log.i("FILTER", "Matched on normalized (whole)");
+                return true;
+            }
+
+            // Split the normalized form of the word, and filter against the start of each word
+            String[] normalizedSplit = word.getNormalized().split(" ");
+
+            for (String s: normalizedSplit) {
+                if (s.startsWith(search)) {
+                    Log.i("FILTER", "Matched on normalized (split)");
+                    return true;
+                }
+            }
+        }
+        // Otherwise the search contains accented characters, so use the original word
+        else {
+
+            if (word.getOriginal().startsWith(search)) {
+                Log.i("FILTER", "Matched on original (whole)");
+                return true;
+            }
+
+            // Split the original form of the word, and filter against the start of each word
+            String[] originalSplit = word.getOriginal().split(" ");
+
+            for (String s : originalSplit) {
+                if (s.startsWith(search)) {
+                    Log.i("FILTER", "Matched on original split");
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     public int getFirstMatchingEntryPosition(CharSequence constraint) {
+
+        String search = constraint.toString();
+        boolean asciiSearch = search.matches(ASCII_REGEX);
 
         Log.i("FILTER", "Using first matching entry position");
 
         long start = System.currentTimeMillis();
-        String search = constraint.toString();
 
         // If no constraint, simply go to the top of the list
-        if (search == null || search.length() == 0) return 0;
+        if (constraint == null || constraint.length() == 0) return 0;
 
         for (Word w : wordArrayList) {
 
-            // Split the normalized form of the word, and filter against the start of each word
-            String[] normalizedSplit = w.getNormalized().split(" ");
-
-            for (String s: normalizedSplit) {
-                if (s.startsWith(search.toString())) {
-                    Log.i("FILTER", "Matched word at position: " + getPosition(w));
-                    long end = System.currentTimeMillis();
-                    String message = "Scroll to position for " + search + " took " + (end - start) + " ms and matched at index " + getPosition(w);
-                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-                    return getPosition(w);
-                }
+            if (matches(search, w, asciiSearch)) {
+                long end = System.currentTimeMillis();
+                String message = "Scroll to position for " + constraint + " took " + (end - start) + " ms and matched at index " + getPosition(w);
+                Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+                return getPosition(w);
             }
         }
 
@@ -117,8 +158,8 @@ public class WordListViewAdapter extends ArrayAdapter<Word> {
         protected FilterResults performFiltering(CharSequence constraint) {
 
             String search = constraint.toString();
+            boolean asciiSearch = search.matches(ASCII_REGEX);
             FilterResults results = new FilterResults();
-            boolean asciiSearch = search.matches("\\A\\p{ASCII}*\\z");
             long start = System.currentTimeMillis();
 
             Log.i("FILTER", "Filtering... searched for: " + constraint + " --> asciiSearch? " + asciiSearch);
@@ -135,35 +176,7 @@ public class WordListViewAdapter extends ArrayAdapter<Word> {
                 List<Word> tempWordList = new ArrayList<>();
 
                 for (Word w : wordArrayList) {
-
-                    // TODO: The search term should be normalized so that we can just search against the normalized field
-
-                    // If the search term contained only ASCII, search using the normalized word
-                    if (asciiSearch) {
-
-                        // Split the normalized form of the word, and filter against the start of each word
-                        String[] normalizedSplit = w.getNormalized().split(" ");
-
-                        for (String s: normalizedSplit) {
-                            if (s.startsWith(search.toString())) {
-                                //Log.i("FILTER", "Filter matched on normalized split. Adding: " + w.getOriginal());
-                                if (!tempWordList.contains(w)) tempWordList.add(w);
-                            }
-                        }
-                    }
-                    // Otherwise the search contains accented characters, so use the original word
-                    else {
-
-                        // Split the normalized form of the word, and filter against the start of each word
-                        String[] originalSplit = w.getOriginal().split(" ");
-
-                        for (String s : originalSplit) {
-                            if (s.startsWith(search.toString())) {
-                                //Log.i("FILTER", "Filter matched on original split. Adding: " + w.getOriginal());
-                                if (!tempWordList.contains(w)) tempWordList.add(w);
-                            }
-                        }
-                    }
+                    if (matches(search, w, asciiSearch)) tempWordList.add(w);
                 }
 
                 results.values = tempWordList;
