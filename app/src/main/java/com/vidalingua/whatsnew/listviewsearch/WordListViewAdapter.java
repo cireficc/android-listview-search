@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +53,7 @@ public class WordListViewAdapter extends ArrayAdapter<Word> {
         }
 
         Word word = wordArrayList.get(position);
-        //Log.i("FILTER", "Got word: " + word.getWord());
+        //Log.i("FILTER", "Got word: " + word.getOriginal());
         holder.wordView.setText(word.getOriginal());
 
         return row;
@@ -88,14 +89,16 @@ public class WordListViewAdapter extends ArrayAdapter<Word> {
             String search = constraint.toString();
             FilterResults results = new FilterResults();
             boolean asciiSearch = search.matches("\\A\\p{ASCII}*\\z");
+            long start = System.currentTimeMillis();
 
-            //Log.i("FILTER", "Filtering... searched for: " + constraint + " --> asciiSearch? " + asciiSearch);
+            Log.i("FILTER", "Filtering... searched for: " + constraint + " --> asciiSearch? " + asciiSearch);
 
             // No filter implemented, so return the whole list
             if (search == null || search.length() == 0) {
-                //Log.i("FILTER", "No filter applied);
+                //Log.i("FILTER", "No filter applied");
                 results.values = wordArrayList;
                 results.count = wordArrayList.size();
+                Log.i("FILTER", "Word array list size: " + wordArrayList.size());
             }
             // Perform the filtering operation
             else {
@@ -113,7 +116,7 @@ public class WordListViewAdapter extends ArrayAdapter<Word> {
 
                         for (String s: normalizedSplit) {
                             if (s.startsWith(search.toString())) {
-                                //Log.i("FILTER", "Filter matched on normalized split. Adding: " + w.getWord());
+                                //Log.i("FILTER", "Filter matched on normalized split. Adding: " + w.getOriginal());
                                 if (!tempWordList.contains(w)) tempWordList.add(w);
                             }
                         }
@@ -126,7 +129,7 @@ public class WordListViewAdapter extends ArrayAdapter<Word> {
 
                         for (String s : originalSplit) {
                             if (s.startsWith(search.toString())) {
-                                //Log.i("FILTER", "Filter matched on original split. Adding: " + w.getWord());
+                                //Log.i("FILTER", "Filter matched on original split. Adding: " + w.getOriginal());
                                 if (!tempWordList.contains(w)) tempWordList.add(w);
                             }
                         }
@@ -136,6 +139,11 @@ public class WordListViewAdapter extends ArrayAdapter<Word> {
                 results.values = tempWordList;
                 results.count = tempWordList.size();
             }
+
+            long end = System.currentTimeMillis();
+            String message = "Filtering took " + (end - start) + " ms and returned " + results.count + " entries";
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+
             return results;
         }
 
@@ -147,7 +155,7 @@ public class WordListViewAdapter extends ArrayAdapter<Word> {
                 notifyDataSetInvalidated();
             else {
                 wordArrayList = (List<Word>) results.values;
-                //Log.i("FILTER", "Word array list new length: " + wordArrayList.size());
+                Log.i("FILTER", "Word array list new length: " + wordArrayList.size());
                 notifyDataSetChanged();
             }
         }

@@ -66,8 +66,13 @@ public class MainActivity extends Activity {
                 "nihongo", "futatsunotango" };
 
         for (int i = 0; i < words.length; i ++) {
-            wordList.add(new Word(words[i], normalized[i]));
+            for (int j = 0; j < 5000; j ++) {
+                wordList.add(new Word(words[i], normalized[i]));
+            }
         }
+
+        // Single unique entry
+        wordList.add(new Word("qqq", "qqq"));
 
         // Sort the word list alphabetically
         Collections.sort(wordList, new Comparator<Word>() {
