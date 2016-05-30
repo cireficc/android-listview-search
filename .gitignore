@@ -37,3 +37,10 @@ captures/
 
 # Keystore files
 *.jks
+
+# Android Studio files
+/.idea/workspace.xml
+/.idea/libraries
+
+# OSX DS Store
+.DS_Store
