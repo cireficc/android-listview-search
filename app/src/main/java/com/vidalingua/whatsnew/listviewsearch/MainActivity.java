@@ -78,14 +78,17 @@ public class MainActivity extends Activity {
                 "deutsche", "zwei worter", "portugues", "duas palavras",
                 "nihongo", "futatsunotango" };
 
+        String alternatives[] = { "", "", "", "", "", "", "", "", "", "", "", "",
+                "日本語", "二つの単語" };
+
         for (int i = 0; i < words.length; i ++) {
             for (int j = 0; j < 5000; j ++) {
-                wordList.add(new Word(words[i], normalized[i]));
+                wordList.add(new Word(words[i], normalized[i], alternatives[i]));
             }
         }
 
         // Single unique entry
-        wordList.add(new Word("qqq", "qqq"));
+        wordList.add(new Word("qqq", "qqq", ""));
 
         // Sort the word list alphabetically
         Collections.sort(wordList, new Comparator<Word>() {
