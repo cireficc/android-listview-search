@@ -64,6 +64,32 @@ public class WordListViewAdapter extends ArrayAdapter<Word> {
         wordArrayList = originalWordArrayList;
     }
 
+    public int getFirstMatchingEntryPosition(CharSequence constraint) {
+
+        Log.i("FILTER", "Using first matching entry position");
+
+        String search = constraint.toString();
+
+        // If no constraint, simply go to the top of the list
+        if (search == null || search.length() == 0) return 0;
+
+        for (Word w : wordArrayList) {
+
+            // Split the normalized form of the word, and filter against the start of each word
+            String[] normalizedSplit = w.getNormalized().split(" ");
+
+            for (String s: normalizedSplit) {
+                if (s.startsWith(search.toString())) {
+                    Log.i("FILTER", "Matched word at position: " + getPosition(w));
+                    return getPosition(w);
+                }
+            }
+        }
+
+        // If all else fails and nothing matched, go to the top of the list
+        return 0;
+    }
+
     @Override
     public Filter getFilter() {
 
