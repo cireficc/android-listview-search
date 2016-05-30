@@ -71,7 +71,7 @@ public class MainActivity extends Activity {
         String words[] = { "English", "two words", "Français", "deux mots",
                 "Espagnol", "dos palabras", "Italiano", "deu parole",
                 "Deutsche", "zwei Wörter", "Português", "duas palavras",
-                "にほんご (日本語)", "ふたつのたんご (二つの単語)" };
+                "にほんご", "ふたつのたんご" };
 
         String normalized[] = { "english", "two words", "francais", "deux mots",
                 "espagnol", "dos palabras", "italiano", "deu parole",

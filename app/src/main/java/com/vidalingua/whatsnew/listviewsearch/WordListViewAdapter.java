@@ -88,7 +88,8 @@ public class WordListViewAdapter extends ArrayAdapter<Word> {
                 }
             }
         }
-        // Otherwise the search contains accented characters, so use the original word
+        // Otherwise the search contains accented characters, so use the original word.
+        // If no entries match on the original field, check the alternative field last
         else {
 
             if (word.getOriginal().startsWith(search)) {
@@ -104,6 +105,11 @@ public class WordListViewAdapter extends ArrayAdapter<Word> {
                     Log.i("FILTER", "Matched on original split");
                     return true;
                 }
+            }
+
+            if (word.getAlternative().contains(search)) {
+                Log.i("FILTER", "Matched on alternative (whole)");
+                return true;
             }
         }
 
