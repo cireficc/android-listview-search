@@ -68,8 +68,6 @@ public class WordListViewAdapter extends ArrayAdapter<Word> {
 
     public boolean matches(String search, String normalizedSearch, Word word, boolean asciiOnly) {
 
-        // TODO: The search term should be normalized so that we can just search against the normalized field
-
         // If the search term contained only ASCII, search using the normalized word
         if (asciiOnly) {
 
@@ -92,7 +90,7 @@ public class WordListViewAdapter extends ArrayAdapter<Word> {
         // If no entries match on the original field, check the alternative field last
         else {
 
-            if (word.getOriginal().startsWith(search)) {
+            if (word.getOriginal().toLowerCase().startsWith(search.toLowerCase())) {
                 Log.i("FILTER", "Matched on original (whole)");
                 return true;
             }
@@ -101,7 +99,7 @@ public class WordListViewAdapter extends ArrayAdapter<Word> {
             String[] originalSplit = word.getOriginal().split(" ");
 
             for (String s : originalSplit) {
-                if (s.startsWith(search)) {
+                if (s.toLowerCase().startsWith(search.toLowerCase())) {
                     Log.i("FILTER", "Matched on original split");
                     return true;
                 }
@@ -119,7 +117,10 @@ public class WordListViewAdapter extends ArrayAdapter<Word> {
     public int getFirstMatchingEntryPosition(CharSequence constraint) {
 
         String search = constraint.toString();
-        String normalizedSearch = Normalizer.normalize(search, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
+        String normalizedSearch =
+                Normalizer.normalize(search, Normalizer.Form.NFD)
+                .replaceAll("[^\\p{ASCII}]", "")
+                .toLowerCase();
         Log.i("FILTER", "Normalized search term: " + normalizedSearch);
         boolean asciiSearch = search.matches(ASCII_REGEX);
 
@@ -128,7 +129,10 @@ public class WordListViewAdapter extends ArrayAdapter<Word> {
         long start = System.currentTimeMillis();
 
         // If no constraint, simply go to the top of the list
-        if (constraint == null || constraint.length() == 0) return 0;
+        if (constraint == null || constraint.length() == 0) {
+            Log.i("FILTER", "Null or empty search: null? " + (constraint == null) + " || empty? " + constraint.length());
+            return 0;
+        }
 
         for (Word w : wordArrayList) {
 
@@ -167,7 +171,10 @@ public class WordListViewAdapter extends ArrayAdapter<Word> {
         protected FilterResults performFiltering(CharSequence constraint) {
 
             String search = constraint.toString();
-            String normalizedSearch = Normalizer.normalize(search, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
+            String normalizedSearch =
+                    Normalizer.normalize(search, Normalizer.Form.NFD)
+                    .replaceAll("[^\\p{ASCII}]", "")
+                    .toLowerCase();
             Log.i("FILTER", "Normalized search term: " + normalizedSearch);
             boolean asciiSearch = search.matches(ASCII_REGEX);
             FilterResults results = new FilterResults();
