@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">ListViewSearch</string>
     <string name="action_settings">Settings</string>
+
+    <string-array name="search_types">
+        <item>ScrollToPosition</item>
+        <item>Filter</item>
+    </string-array>
 </resources>

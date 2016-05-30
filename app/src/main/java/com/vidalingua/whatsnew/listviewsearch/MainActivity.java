@@ -4,8 +4,10 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,7 +28,7 @@ public class MainActivity extends Activity {
 
         initializeList();
 
-        ListView lv = (ListView) findViewById(R.id.list_view);
+        final ListView lv = (ListView) findViewById(R.id.list_view);
         inputSearch = (EditText) findViewById(R.id.dictionary_search);
 
         adapter = new WordListViewAdapter(MainActivity.this.getBaseContext(), wordList);
@@ -42,7 +44,20 @@ public class MainActivity extends Activity {
                     adapter.resetData();
                 }
 
-                adapter.getFilter().filter(cs);
+                Spinner searchTypeSpinner = (Spinner) findViewById(R.id.search_type);
+                String searchType = searchTypeSpinner.getSelectedItem().toString();
+                Log.i("FILTER", "Search type: " + searchType);
+
+                if (searchType.equalsIgnoreCase("scrolltoposition")) {
+                    Log.i("FILTER", "Using scroll to position");
+                    int matchedPosition = adapter.getFirstMatchingEntryPosition(cs);
+                    lv.setSelection(matchedPosition);
+                }
+                else {
+                    Log.i("FILTER", "Using filter");
+                    adapter.getFilter().filter(cs);
+                }
+
             }
 
             @Override
