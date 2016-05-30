@@ -68,6 +68,7 @@ public class WordListViewAdapter extends ArrayAdapter<Word> {
 
         Log.i("FILTER", "Using first matching entry position");
 
+        long start = System.currentTimeMillis();
         String search = constraint.toString();
 
         // If no constraint, simply go to the top of the list
@@ -81,6 +82,9 @@ public class WordListViewAdapter extends ArrayAdapter<Word> {
             for (String s: normalizedSplit) {
                 if (s.startsWith(search.toString())) {
                     Log.i("FILTER", "Matched word at position: " + getPosition(w));
+                    long end = System.currentTimeMillis();
+                    String message = "Scroll to position for " + search + " took " + (end - start) + " ms and matched at index " + getPosition(w);
+                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
                     return getPosition(w);
                 }
             }
@@ -167,7 +171,7 @@ public class WordListViewAdapter extends ArrayAdapter<Word> {
             }
 
             long end = System.currentTimeMillis();
-            String message = "Filtering took " + (end - start) + " ms and returned " + results.count + " entries";
+            String message = "Filtering for " + search + " took " + (end - start) + " ms and returned " + results.count + " entries";
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
 
             return results;
