@@ -10,6 +10,7 @@ import android.widget.Filter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,14 +66,14 @@ public class WordListViewAdapter extends ArrayAdapter<Word> {
         wordArrayList = originalWordArrayList;
     }
 
-    public boolean matches(String search, Word word, boolean asciiOnly) {
+    public boolean matches(String search, String normalizedSearch, Word word, boolean asciiOnly) {
 
         // TODO: The search term should be normalized so that we can just search against the normalized field
 
         // If the search term contained only ASCII, search using the normalized word
         if (asciiOnly) {
 
-            if (word.getNormalized().startsWith(search)) {
+            if (word.getNormalized().startsWith(normalizedSearch)) {
                 Log.i("FILTER", "Matched on normalized (whole)");
                 return true;
             }
@@ -81,7 +82,7 @@ public class WordListViewAdapter extends ArrayAdapter<Word> {
             String[] normalizedSplit = word.getNormalized().split(" ");
 
             for (String s: normalizedSplit) {
-                if (s.startsWith(search)) {
+                if (s.startsWith(normalizedSearch)) {
                     Log.i("FILTER", "Matched on normalized (split)");
                     return true;
                 }
@@ -112,6 +113,8 @@ public class WordListViewAdapter extends ArrayAdapter<Word> {
     public int getFirstMatchingEntryPosition(CharSequence constraint) {
 
         String search = constraint.toString();
+        String normalizedSearch = Normalizer.normalize(search, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
+        Log.i("FILTER", "Normalized search term: " + normalizedSearch);
         boolean asciiSearch = search.matches(ASCII_REGEX);
 
         Log.i("FILTER", "Using first matching entry position");
@@ -123,7 +126,7 @@ public class WordListViewAdapter extends ArrayAdapter<Word> {
 
         for (Word w : wordArrayList) {
 
-            if (matches(search, w, asciiSearch)) {
+            if (matches(search, normalizedSearch, w, asciiSearch)) {
                 long end = System.currentTimeMillis();
                 String message = "Scroll to position for " + constraint + " took " + (end - start) + " ms and matched at index " + getPosition(w);
                 Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
@@ -158,11 +161,14 @@ public class WordListViewAdapter extends ArrayAdapter<Word> {
         protected FilterResults performFiltering(CharSequence constraint) {
 
             String search = constraint.toString();
+            String normalizedSearch = Normalizer.normalize(search, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
+            Log.i("FILTER", "Normalized search term: " + normalizedSearch);
             boolean asciiSearch = search.matches(ASCII_REGEX);
             FilterResults results = new FilterResults();
-            long start = System.currentTimeMillis();
 
             Log.i("FILTER", "Filtering... searched for: " + constraint + " --> asciiSearch? " + asciiSearch);
+
+            long start = System.currentTimeMillis();
 
             // No filter implemented, so return the whole list
             if (search == null || search.length() == 0) {
@@ -176,7 +182,7 @@ public class WordListViewAdapter extends ArrayAdapter<Word> {
                 List<Word> tempWordList = new ArrayList<>();
 
                 for (Word w : wordArrayList) {
-                    if (matches(search, w, asciiSearch)) tempWordList.add(w);
+                    if (matches(search, normalizedSearch, w, asciiSearch)) tempWordList.add(w);
                 }
 
                 results.values = tempWordList;
