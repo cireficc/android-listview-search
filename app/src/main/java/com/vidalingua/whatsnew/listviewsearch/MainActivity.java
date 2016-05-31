@@ -68,10 +68,10 @@ public class MainActivity extends Activity {
 
     private void initializeList() {
 
-        String words[] = { "English", "two words", "Français", "deux mots",
+        String originals[] = { "English", "two words", "Français", "deux mots",
                 "Espagnol", "dos palabras", "Italiano", "deu parole",
                 "Deutsche", "zwei Wörter", "Português", "duas palavras",
-                "にほんご", "ふたつのたんご" };
+                "日本語", "二つの単語" };
 
         String normalized[] = { "english", "two words", "francais", "deux mots",
                 "espagnol", "dos palabras", "italiano", "deu parole",
@@ -79,11 +79,11 @@ public class MainActivity extends Activity {
                 "nihongo", "futatsunotango" };
 
         String alternatives[] = { "", "", "", "", "", "", "", "", "", "", "", "",
-                "日本語", "二つの単語" };
+                "にほんご", "ふたつのたんご" };
 
-        for (int i = 0; i < words.length; i ++) {
+        for (int i = 0; i < originals.length; i ++) {
             for (int j = 0; j < 5000; j ++) {
-                wordList.add(new Word(words[i], normalized[i], alternatives[i]));
+                wordList.add(new Word(originals[i], normalized[i], alternatives[i]));
             }
         }
 
