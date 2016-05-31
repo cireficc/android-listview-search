@@ -60,7 +60,11 @@ public class WordListViewAdapter extends ArrayAdapter<Word> {
 
         Word word = wordArrayList.get(position);
         //Log.i(FILTER_TAG, "Got word: " + word.getOriginal());
-        holder.wordView.setText(word.getOriginal());
+        if (word.getAlternative().isEmpty()) {
+            holder.wordView.setText(word.getOriginal());
+        } else {
+            holder.wordView.setText(word.getOriginal() + " (" + word.getAlternative() + ")");
+        }
 
         return row;
     }
